@@ -1,14 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from "react-icons-kit";
 import { search } from "react-icons-kit/feather/search";
 import styled from "styled-components";
+import { useDispatch } from "react-redux";
+import { getCityData } from "./store/slices/weatherSlice.js";
 
 function App() {
   const [loadings, setLoadings] = useState(true);
-  const [city, setCity] = useState("");
+  const [city, setCity] = useState("Mohali");
+  const [unit, setUnit] = useState("metric");
+
+  const dispatch = useDispatch();
+
+  const fetchData = () => {
+    dispatch(
+      getCityData({
+        city,
+        unit,
+      })
+    ).then((res) => {
+      console.log(res);
+    });
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
   const handleCitySearch = (e) => {
     e.preventDefault();
-    setLoadings(true);
+    // setLoadings(true);
     // fetchData();
   };
   return (
@@ -24,7 +45,7 @@ function App() {
           required
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          readOnly={!loadings}
+          // readOnly={!loadings}
         />
         <button type="submit">GO</button>
       </form>
