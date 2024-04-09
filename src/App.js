@@ -3,7 +3,7 @@ import Icon from "react-icons-kit";
 import { search } from "react-icons-kit/feather/search";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
-import { getCityData } from "./store/slices/weatherSlice.js";
+import { getCityData, get5DaysForecast } from "./store/slices/weatherSlice.js";
 
 function App() {
   const [loadings, setLoadings] = useState(true);
@@ -20,17 +20,29 @@ function App() {
       })
     ).then((res) => {
       console.log(res);
+      if (!res.payload.error) {
+        dispatch(
+          get5DaysForecast({
+            lat: res.payload.data.coord.lat,
+            lon: res.payload.data.coord.lon,
+            unit,
+          })
+        ).then((res) => {
+          console.log(res);
+        });
+      }
     });
   };
 
   useEffect(() => {
     fetchData();
-  }, [])
+  }, []);
 
   const handleCitySearch = (e) => {
     e.preventDefault();
     // setLoadings(true);
     // fetchData();
+    fetchData();
   };
   return (
     <Root>
