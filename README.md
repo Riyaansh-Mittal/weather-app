@@ -1,8 +1,26 @@
-# Getting Started with Create React App
+# My Weather App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a React application that allows users to search for weather information for multiple cities.
 
-## Available Scripts
+## Usage
+
+- Enter the name of a city in the search bar and click "GO" to add it to the list of cities.
+- Click on a city card to view detailed weather information.
+- Click the "Close" button to close the weather details popup.
+
+## Installation
+
+To install the dependencies, delete the package-lock.json and run:
+npm install
+
+## Dependencies
+
+- React
+- React DOM
+- React Icons
+- Styled Components
+- React Redux
+- React Spinners Kit
 
 In the project directory, you can run:
 
