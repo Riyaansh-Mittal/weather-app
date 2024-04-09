@@ -42,18 +42,23 @@ function App() {
         unit,
       })
     ).then((res) => {
-      console.log(res);
-      if (!res.payload.error) {
-        const { coord, main, weather } = res.payload.data;
-        const cityData = {
-          name: city,
-          lat: coord.lat,
-          lon: coord.lon,
-          temp: main.temp,
-          description: weather[0].description,
-          icon: weather[0].icon,
-        };
-        setCitiesData((prevCitiesData) => [...prevCitiesData, cityData]);
+      if (res.payload) {
+        if (!res.payload.error && res.payload.data) {
+          const { coord, main, weather } = res.payload.data;
+          const cityData = {
+            name: city,
+            lat: coord.lat,
+            lon: coord.lon,
+            temp: main.temp,
+            description: weather[0].description,
+            icon: weather[0].icon,
+          };
+          setCitiesData((prevCitiesData) => [...prevCitiesData, cityData]);
+        } else {
+          alert("No data found for the city: " + city);
+        }
+      } else {
+        alert("Failed to fetch data. Please check your internet connection.");
       }
     });
   };
@@ -69,41 +74,44 @@ function App() {
       }
     }
   };
-  const handleRemoveCity = (name) => {
+  const handleRemoveCity = (e, name) => {
+    e.stopPropagation();
     setCitiesData((prevCitiesData) =>
       prevCitiesData.filter((city) => city.name !== name)
     );
   };
 
   const handleCityCardClick = (city) => {
-    setSelectedCity(city); // Set the selected city when a card is clicked
+    setSelectedCity(city);
   };
 
   const handleClosePopup = () => {
-    setSelectedCity(null); // Reset the selected city when the popup is closed
+    setSelectedCity(null);
   };
 
   const fetchCityDataForPopup = () => {
-    // Fetch additional data for the selected city
     dispatch(
       getCityData({
         city: selectedCity.name,
         unit,
       })
     ).then((res) => {
-      console.log(res);
-      if (!res.payload.error) {
-        const { coord } = res.payload.data;
-        // Fetch 5 days forecast data for the selected city
-        dispatch(
-          get5DaysForecast({
-            lat: coord.lat,
-            lon: coord.lon,
-            unit,
-          })
-        ).then((res) => {
-          console.log(res);
-        });
+      if (res.payload) {
+        if (!res.payload.error) {
+          const { coord } = res.payload.data;
+          dispatch(
+            get5DaysForecast({
+              lat: coord.lat,
+              lon: coord.lon,
+              unit,
+            })
+          ).then((res) => {
+            console.log(res);
+          });
+        }
+      } else {
+        alert("Failed to fetch data. Please check your internet connection.");
+        handleClosePopup();
       }
     });
   };
@@ -145,7 +153,7 @@ function App() {
       <CitiesContainer>
         {citiesData.map((cityData, index) => (
           <CityCard key={index} onClick={() => handleCityCardClick(cityData)}>
-            <DeleteButton onClick={() => handleRemoveCity(cityData.name)}>
+            <DeleteButton onClick={(e) => handleRemoveCity(e, cityData.name)}>
               <MdDelete size={20} />
             </DeleteButton>
             <h2>{cityData.name}</h2>
@@ -182,8 +190,10 @@ function App() {
                         <>
                           {citySearchData && citySearchData.data ? (
                             <div className="weather-details-container">
-                              {/* details */}
-                              <div className="details">
+                              <div
+                                className="details"
+                                style={{ borderRight: "1px solid #a09aa0" }}
+                              >
                                 <h4 style={{ color: "#2fa5ed" }}>
                                   {citySearchData.data.name}
                                 </h4>
@@ -213,16 +223,16 @@ function App() {
                                 </h4>
                               </div>
 
-                              {/* metrices */}
-                              <div className="metrices">
-                                {/* feels like */}
+                              <div
+                                className="metrices"
+                                style={{ paddingLeft: "15px" }}
+                              >
                                 <h4>
                                   Feels like{" "}
                                   {citySearchData.data.main.feels_like}
                                   &deg;C
                                 </h4>
 
-                                {/* min max temp */}
                                 <div className="key-value-box">
                                   <div className="key">
                                     <FaArrowUp size={20} />
@@ -239,8 +249,6 @@ function App() {
                                     </span>
                                   </div>
                                 </div>
-
-                                {/* humidity */}
                                 <div className="key-value-box">
                                   <div className="key">
                                     <FiDroplet size={20} />
@@ -252,8 +260,6 @@ function App() {
                                     </span>
                                   </div>
                                 </div>
-
-                                {/* wind */}
                                 <div className="key-value-box">
                                   <div className="key">
                                     <FaWind size={20} />
@@ -266,8 +272,6 @@ function App() {
                                     </span>
                                   </div>
                                 </div>
-
-                                {/* pressure */}
                                 <div className="key-value-box">
                                   <div className="key">
                                     <CiWavePulse1 size={20} />
@@ -285,7 +289,6 @@ function App() {
                           ) : (
                             <div className="error-msg">No Data Found</div>
                           )}
-                          {/* extended forecastData */}
                           <h4 className="extended-forecast-heading">
                             Extended Forecast
                           </h4>
@@ -424,9 +427,10 @@ const Popup = styled.div`
   width: 60%;
   position: fixed;
   padding: 5px;
-  top: 50%; /* Center vertically */
-  left: 50%; /* Center horizontally */
-  transform: translate(-50%, -50%); /* Centering trick */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
   display: flex;
   flex-direction: column;
   background-color: #fff;
@@ -435,13 +439,12 @@ const Popup = styled.div`
   @media (max-width: 768px) {
     top: 50%;
     transform: translate(-50%, -50%);
-    height: 80%; /* Adjust height as needed */
+    height: 80%;
     overflow-y: auto;
   }
 `;
 
 const PopupContent = styled.div`
-  /* loader */
   .loader {
     margin-top: 15px;
     display: flex;
@@ -450,7 +453,6 @@ const PopupContent = styled.div`
     padding: 15px;
   }
 
-  /* error */
   .error-msg {
     width: 100%;
     background-color: #f8d7da;
@@ -463,24 +465,14 @@ const PopupContent = styled.div`
     border-radius: 0.25rem;
   }
 
-  /* weather details container */
   .current-weather-details-box .weather-details-container {
     width: 100%;
     display: flex;
   }
 
-  /* details and merices */
   .weather-details-container .details,
   .weather-details-container .metrices {
     flex: 1;
-  }
-
-  .weather-details-container .details {
-    border-right: 1px solid #a09aa0;
-  }
-
-  .weather-details-container .metrices {
-    padding-left: 15px;
   }
 
   @media (max-width: 768px) {
@@ -505,20 +497,16 @@ const PopupContent = styled.div`
     }
   }
 
-  /* details children */
-
   .weather-details-container .details .description {
     color: #a09aa0;
   }
 
-  /* metrices children */
   .weather-details-container .metrices h4 {
     color: #2fa5ed;
     margin-left: 4px;
     margin-bottom: 25px;
   }
 
-  /* key value box */
   .weather-details-container .metrices .key-value-box {
     width: 100%;
     display: flex;
