@@ -432,6 +432,7 @@ const Popup = styled.div`
   flex-direction: column;
   background-color: #fff;
   border-radius: 4px;
+  border: 2px solid black;
   height: max-content;
   @media (max-width: 768px) {
     width: 80%;
