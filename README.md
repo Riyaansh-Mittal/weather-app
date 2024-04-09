@@ -21,6 +21,7 @@ npm install
 - Styled Components
 - React Redux
 - React Spinners Kit
+- @Reduxjs/toolkit
 
 In the project directory, you can run:
 
