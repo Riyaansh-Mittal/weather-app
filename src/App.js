@@ -190,10 +190,7 @@ function App() {
                         <>
                           {citySearchData && citySearchData.data ? (
                             <div className="weather-details-container">
-                              <div
-                                className="details"
-                                style={{ borderRight: "1px solid #a09aa0" }}
-                              >
+                              <div className="details">
                                 <h4 style={{ color: "#2fa5ed" }}>
                                   {citySearchData.data.name}
                                 </h4>
@@ -437,6 +434,7 @@ const Popup = styled.div`
   border-radius: 4px;
   height: max-content;
   @media (max-width: 768px) {
+    width: 80%;
     top: 50%;
     transform: translate(-50%, -50%);
     height: 80%;
@@ -473,6 +471,10 @@ const PopupContent = styled.div`
   .weather-details-container .details,
   .weather-details-container .metrices {
     flex: 1;
+  }
+
+  .weather-details-container .details {
+    border-right: 1px solid #a09aa0;
   }
 
   @media (max-width: 768px) {
